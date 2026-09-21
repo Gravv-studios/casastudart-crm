@@ -12,11 +12,11 @@ CRM comercial, operacional e financeiro com contatos, campanhas de WhatsApp, alt
 - Fluxo de caixa previsto e realizado.
 - Tarefas, agenda, relatórios, histórico e backup.
 
-## GitHub Pages
+## Vercel
 
-O workflow `.github/workflows/pages.yml` valida e publica automaticamente a versão estática a cada envio para `master` ou `main`.
+O arquivo `vercel.json` configura a publicação da versão estática na Vercel a partir do repositório do GitHub.
 
-Na edição do GitHub Pages, os dados ficam salvos no navegador de cada dispositivo. Use o backup em **Configurações e guia** para preservar os registros. Um banco compartilhado exige uma API/banco externo porque o GitHub Pages não executa servidor.
+Na edição publicada, os dados ficam salvos no navegador de cada dispositivo. Use o backup em **Configurações e guia** para preservar os registros. Um banco compartilhado exige uma API/banco externo.
 
 ## Desenvolvimento local
 
@@ -26,7 +26,7 @@ Requisitos: Node 22.13 ou superior e npm.
 2. `npm run dev`
 3. Abra `http://localhost:3000`
 
-O banco local fica em `.wrangler/state` e é separado do armazenamento do GitHub Pages.
+O banco local fica em `.wrangler/state` e é separado do armazenamento da edição publicada.
 
 ## Verificações
 
@@ -34,7 +34,8 @@ O banco local fica em `.wrangler/state` e é separado do armazenamento do GitHub
 - `npm test`: regras, cálculos e reconciliação financeira.
 - `npm run test:api`: persistência e mutações da API local.
 - `npm run build`: aplicação completa com servidor.
-- `npm run build:pages`: edição estática hospedável no GitHub Pages.
+- `npm run build:pages`: edição estática preparada para GitHub Pages.
+- `npm run build:vercel`: edição estática preparada para Vercel.
 
 ## Limites
 
