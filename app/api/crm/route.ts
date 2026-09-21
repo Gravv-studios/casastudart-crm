@@ -4,18 +4,18 @@ const json=(body:unknown,status=200)=>Response.json(body,{status,headers:{'Cache
 type Row={id:string;kind:string;payload:string;updated_at:string};
 async function initialize() {
  const db=getDb();
- if(await db.prepare("SELECT id FROM records WHERE id = ?").bind('_initialized').first())return;
+ if(await db.prepare("SELECT id FROM records WHERE id = ?").bind('_initialized_v3').first())return;
  const stamp=new Date().toISOString();
  await db.batch([
   ...seedEntries.map(e=>db.prepare('INSERT OR IGNORE INTO records (id,kind,payload,updated_at) VALUES (?,?,?,?)').bind(e.id,e.kind,JSON.stringify(e.data),e.updatedAt)),
-  db.prepare('INSERT OR IGNORE INTO records (id,kind,payload,updated_at) VALUES (?,?,?,?)').bind('_initialized','meta','{}',stamp),
-  db.prepare('INSERT OR IGNORE INTO activity (id,entity_id,action,label,created_at) VALUES (?,?,?,?,?)').bind('init','_initialized','Demonstração preparada','Cadastros fictícios carregados para apresentação.',stamp)
+  db.prepare('INSERT OR IGNORE INTO records (id,kind,payload,updated_at) VALUES (?,?,?,?)').bind('_initialized_v3','meta','{}',stamp),
+  db.prepare('INSERT OR IGNORE INTO activity (id,entity_id,action,label,created_at) VALUES (?,?,?,?,?)').bind('init-v3','_initialized_v3','Financeiro ampliado','Contas a receber, fluxo de caixa e separação financeira preparados para o Hugo.',stamp)
  ]);
 }
 export async function GET() {
- try{await initialize();const db=getDb();const [r,a]=await db.batch([db.prepare("SELECT id,kind,payload,updated_at FROM records WHERE kind IN ('contact','ticket','task','note') ORDER BY updated_at DESC"),db.prepare('SELECT * FROM activity ORDER BY created_at DESC LIMIT 200')]);
+ try{await initialize();const db=getDb();const [r,a]=await db.batch([db.prepare("SELECT id,kind,payload,updated_at FROM records WHERE kind IN ('contact','ticket','task','note','campaign','site','expense','income') ORDER BY updated_at DESC"),db.prepare('SELECT * FROM activity ORDER BY created_at DESC LIMIT 200')]);
  return json({entries:(r.results as Row[]).map(row=>({id:row.id,kind:row.kind,data:JSON.parse(row.payload),updatedAt:row.updated_at})),activity:a.results});
- }catch{return json({error:'Não foi possível carregar o banco de demonstração. Tente novamente.'},503);}
+ }catch{return json({error:'Não foi possível carregar os dados do CRM. Tente novamente.'},503);}
 }
 async function mutation(request:Request,method:string){
  try{

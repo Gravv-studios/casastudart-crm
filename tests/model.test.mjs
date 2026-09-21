@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {summarize,ranking,validateEntry,makeCsv,seedEntries,ledger,periodLedger} from '../lib/model.ts';
+import {summarize,ranking,validateEntry,makeCsv,seedEntries,ledger,periodLedger,financialSummary} from '../lib/model.ts';
 test('historical totals exclude refunded records and units',()=>{
  const rows=[{gross:10000,refund:0,units:2,category:'Linha A'},{gross:20000,refund:20000,units:4,category:'Linha A'},{gross:30000,refund:0,units:3,category:'Linha B'}];
  assert.deepEqual(summarize(rows),{gross:60000,refunds:20000,net:40000,count:3,validCount:2,ticket:20000,units:5});
@@ -17,4 +17,15 @@ test('seed contacts and editable records pass validation',()=>{for(const e of se
 test('invalid dates, malformed email, unknown fields and workflow states rejected',()=>{
  const task=seedEntries.find(e=>e.kind==='task').data,contact=seedEntries.find(e=>e.kind==='contact').data;
  assert.throws(()=>validateEntry('task',{...task,due:'2026-02-31'}));assert.throws(()=>validateEntry('task',{...task,time:'25:00'}));assert.throws(()=>validateEntry('task',{...task,status:'Wrong'}));assert.throws(()=>validateEntry('contact',{...contact,email:'invalid'}));assert.throws(()=>validateEntry('contact',{...contact,isAdmin:'true'}));assert.throws(()=>validateEntry('payment',{}));
+});
+test('financial summary separates projected, realized, overdue and personal values',()=>{
+ const entries=[
+  {kind:'income',data:{amount:'1000.00',due:'2026-09-10',status:'Recebido',scope:'Empresa'}},
+  {kind:'income',data:{amount:'500.00',due:'2026-09-12',status:'Pendente',scope:'Empresa'}},
+  {kind:'expense',data:{amount:'300.00',due:'2026-09-05',status:'Pago',scope:'Empresa'}},
+  {kind:'expense',data:{amount:'200.00',due:'2026-09-15',status:'Pendente',scope:'Empresa'}},
+  {kind:'expense',data:{amount:'900.00',due:'2026-09-15',status:'Pendente',scope:'Pessoal'}},
+ ];
+ const result=financialSummary(entries,'2026-09','Empresa');
+ assert.equal(result.projected,100000);assert.equal(result.realized,70000);assert.equal(result.receivable,50000);assert.equal(result.payable,20000);assert.equal(result.overdueReceivable,50000);assert.equal(result.overduePayable,20000);
 });
