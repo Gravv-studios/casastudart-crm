@@ -42,3 +42,4 @@ next-env.d.ts
 *.tsbuildinfo
 /dependency-audit.json
 
+# O vínculo e as credenciais locais da Vercel já são ignorados acima.

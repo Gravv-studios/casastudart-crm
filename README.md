@@ -14,7 +14,9 @@ CRM comercial, operacional e financeiro com contatos, campanhas de WhatsApp, alt
 
 ## Vercel
 
-O arquivo `vercel.json` configura a publicação da versão estática na Vercel a partir do repositório do GitHub.
+O repositório oficial é `https://github.com/Gravv-studios/casastudart-crm`. Ele está conectado ao projeto `casastudart-crm` da Vercel: cada commit enviado à branch `master` dispara automaticamente uma nova publicação.
+
+O arquivo `vercel.json` configura a publicação da versão estática na Vercel a partir desse repositório.
 
 Na edição publicada, os dados ficam salvos no navegador de cada dispositivo. Use o backup em **Configurações e guia** para preservar os registros. Um banco compartilhado exige uma API/banco externo.
 
