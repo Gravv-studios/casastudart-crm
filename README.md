@@ -7,6 +7,7 @@ CRM comercial, operacional e financeiro com contatos, campanhas de WhatsApp, alt
 - Visão geral das prioridades e do caixa.
 - Contatos e histórico de atendimento.
 - Mensagens de ofertas para abertura assistida no WhatsApp.
+- QR Codes para avaliação direta no Google e acesso ao perfil do Instagram, com download em PNG.
 - Pedidos e versões de textos dos sites.
 - Contas a pagar e receber, atrasos, recorrências e separação entre empresa e pessoal.
 - Fluxo de caixa previsto e realizado.
@@ -19,6 +20,8 @@ O repositório oficial é `https://github.com/Gravv-studios/casastudart-crm`. El
 O arquivo `vercel.json` configura a publicação da versão estática na Vercel a partir desse repositório.
 
 Na edição publicada, os dados ficam salvos no navegador de cada dispositivo. Use o backup em **Configurações e guia** para preservar os registros. Um banco compartilhado exige uma API/banco externo.
+
+Em **Avaliações e QR**, cadastre o link de avaliação obtido no Perfil da Empresa do Google (Ler avaliações → Receber mais avaliações) e o perfil oficial do Instagram. Os links e os QR Codes ficam salvos no navegador usado para configurá-los. Teste cada link antes de compartilhar a imagem com clientes.
 
 ## Desenvolvimento local
 

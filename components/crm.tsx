@@ -1,6 +1,6 @@
 'use client';
 import { useCallback, useEffect, useState } from 'react';
-import { LayoutDashboard, Users, Headphones, CalendarDays, CheckSquare, BarChart3, History, Settings, ChevronRight, CircleHelp, Sparkles, RefreshCw, CheckCircle2, X, Info, ArrowRight, ArrowLeft, MessageCircle, Globe2, WalletCards } from 'lucide-react';
+import { LayoutDashboard, Users, Headphones, CalendarDays, CheckSquare, BarChart3, History, Settings, ChevronRight, CircleHelp, Sparkles, RefreshCw, CheckCircle2, X, Info, ArrowRight, ArrowLeft, MessageCircle, Globe2, WalletCards, QrCode } from 'lucide-react';
 import { Sidebar, SidebarProvider, SidebarContent, SidebarHeader, SidebarFooter, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
 import { Dialog, DialogContent, DialogTitle, DialogDescription, DialogHeader } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogContent, AlertDialogTitle, AlertDialogDescription, AlertDialogHeader, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@/components/ui/alert-dialog';
@@ -15,12 +15,14 @@ import Help, { ActivityLog } from './help';
 import { Editor, ContactDetail, Draft } from './editor';
 import { Campaigns, Sites } from './business';
 import Finance from './finance';
+import ReviewQr from './review-qr';
 import { loadLocalCrm, mutateLocalCrm } from '@/lib/client-store';
-const nav=[['overview','Visão geral',LayoutDashboard],['contacts','Contatos',Users],['campaigns','WhatsApp',MessageCircle],['sites','Sites e textos',Globe2],['finance','Financeiro',WalletCards],['support','Atendimentos',Headphones],['tasks','Tarefas',CheckSquare],['calendar','Agenda',CalendarDays],['reports','Relatórios',BarChart3],['activity','Histórico',History],['settings','Configurações e guia',Settings]] as const;
+const nav=[['overview','Visão geral',LayoutDashboard],['contacts','Contatos',Users],['campaigns','WhatsApp',MessageCircle],['reviews','Avaliações e QR',QrCode],['sites','Sites e textos',Globe2],['finance','Financeiro',WalletCards],['support','Atendimentos',Headphones],['tasks','Tarefas',CheckSquare],['calendar','Agenda',CalendarDays],['reports','Relatórios',BarChart3],['activity','Histórico',History],['settings','Configurações e guia',Settings]] as const;
 const headings:Record<string,[string,string]>={
  overview:['Tudo começa com uma boa visão.','Acompanhe a rotina, os relacionamentos e os números da Casa.'],
  contacts:['Cada relacionamento, em um só lugar.','Cadastros, contexto e histórico de atendimento.'],
  campaigns:['Ofertas prontas para conversar.','Crie mensagens personalizadas e abra cada conversa no WhatsApp.'],
+ reviews:['Facilite o próximo passo do cliente.','QR Codes para avaliação no Google e acesso ao Instagram.'],
  sites:['Os textos dos sites, sob controle.','Organize pedidos, versões, responsáveis, prazos e aprovações.'],
  finance:['O dinheiro da empresa, finalmente organizado.','Acompanhe o que entra, o que sai, os atrasos e o saldo do caixa.'],
  support:['Cuidado em cada atendimento.','Acompanhe solicitações do primeiro contato à resolução.'],
@@ -56,6 +58,7 @@ function Workspace(){
  return <><a className="skip-link" href="#main-content">Pular para o conteúdo</a><Sidebar className="brand-sidebar"><SidebarHeader><button className="brand-lockup" onClick={()=>navigate('overview')} aria-label="CRM do Hugo — visão geral"><span className="brand-mark">HU</span><span>CRM DO HUGO<small>NEGÓCIOS & CONTROLE</small></span></button></SidebarHeader><SidebarContent><p className="nav-label">ESPAÇO DE TRABALHO</p><SidebarMenu>{nav.map(([id,label,Icon])=><SidebarMenuItem key={id}><SidebarMenuButton className="nav-item" isActive={view===id} onClick={()=>navigate(id)}><Icon/><span>{label}</span>{id==='support'&&openTickets>0&&<b>{openTickets}</b>}</SidebarMenuButton></SidebarMenuItem>)}</SidebarMenu></SidebarContent><SidebarFooter><button className="demo-card" onClick={()=>setTour(0)}><Sparkles/><strong>Conheça o seu CRM</strong><p>Um passeio de 5 passos <ArrowRight/></p></button><div className="profile"><span className="avatar">HU</span><div><strong>Hugo</strong><small>Administrador</small></div></div></SidebarFooter></Sidebar><main className="workspace" id="main-content"><header className="topbar"><div className="breadcrumbs"><SidebarTrigger/><span>CRM do Hugo</span><ChevronRight/><strong>{nav.find(x=>x[0]===view)?.[1]}</strong></div><div className="top-actions"><span className="live-dot"/><span>Dados salvos</span><button className="icon-button" aria-label="Atualizar registros" disabled={busy||loading} onClick={()=>void reload()}><RefreshCw/></button><button className="icon-button" aria-label="Guia do CRM" onClick={()=>setTour(0)}><CircleHelp/></button></div></header><div className="page"><div className="page-heading"><div><p className="eyebrow">CRM DO HUGO · PAINEL DE GESTÃO</p><h1>{headings[view][0]}</h1><p>{headings[view][1]}</p></div></div>{loading?<div className="metric-grid" aria-label="Carregando registros" aria-busy="true">{[1,2,3,4].map(i=><section key={i} className="metric"><Skeleton className="h-5 w-3/4"/><Skeleton className="h-10 w-1/2 my-4"/><Skeleton className="h-4 w-full"/></section>)}</div>:error?<div className="error-box" role="alert"><Info style={{margin:'auto'}}/><h2>Não foi possível atualizar o painel.</h2><p>{error}</p><button className="primary-button" onClick={()=>void reload()}>Tentar novamente</button></div>:<>{view==='overview'&&<Dashboard entries={entries} period={period} setPeriod={setPeriod} navigate={navigate} edit={edit}/>}
  {view==='contacts'&&<Contacts entries={entries} create={()=>create('contact')} edit={edit} remove={setDeleting} detail={e=>setDetailId(e.id)}/>}
  {view==='campaigns'&&<Campaigns {...workProps}/>}
+ {view==='reviews'&&<ReviewQr/>}
  {view==='sites'&&<Sites {...workProps}/>}
  {view==='finance'&&<Finance {...workProps}/>}
  {view==='support'&&<Support {...workProps}/>}
