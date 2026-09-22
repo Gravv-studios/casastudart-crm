@@ -5,16 +5,25 @@ import QRCode from 'qrcode';
 import { Camera, Copy, Download, ExternalLink, Star } from 'lucide-react';
 
 const STORAGE_KEY = 'crm-hugo-public-links-v1';
-const DEFAULT_LINKS = { google: '', instagram: '' };
+const DEFAULT_LINKS = {
+  google: 'https://www.google.com/maps/place//data=!4m3!3m2!1s0x935c6d04a4d772ed:0xba368c99c425c802!12e1',
+  instagram: 'https://www.instagram.com/casastudart/',
+};
 type Links = typeof DEFAULT_LINKS;
 type Channel = keyof Links;
 
 function normalizeGoogle(value: string) {
   const url = new URL(value.trim());
   const host = url.hostname.toLowerCase();
+  const googleHost = host === 'google.com' || host === 'www.google.com';
+  const searchReview = googleHost && url.pathname === '/search' && url.hash.match(/^#lrd=(0x[0-9a-f]+:0x[0-9a-f]+),3(?:,|$)/i);
+  if (url.protocol === 'https:' && searchReview) {
+    return `https://www.google.com/maps/place//data=!4m3!3m2!1s${searchReview[1]}!12e1`;
+  }
   const directReview = (host === 'g.page' && url.pathname.replace(/\/+$/, '').endsWith('/review')) ||
-    (host === 'search.google.com' && url.pathname === '/local/writereview' && url.searchParams.has('placeid'));
-  if (url.protocol !== 'https:' || !directReview) throw new Error('Use o link direto de avaliação do Perfil da Empresa no Google, terminado em /review.');
+    (host === 'search.google.com' && url.pathname === '/local/writereview' && url.searchParams.has('placeid')) ||
+    (googleHost && /^\/maps\/place\/.*\/data=!4m3!3m2!1s0x[0-9a-f]+:0x[0-9a-f]+!12e1$/i.test(url.pathname));
+  if (url.protocol !== 'https:' || !directReview) throw new Error('Use o link direto de avaliação do Google ou o link da ficha com #lrd.');
   return url.toString();
 }
 
@@ -96,7 +105,7 @@ export default function ReviewQr() {
     <section className="panel qr-setup">
       <div className="panel-heading"><div><p className="eyebrow">CONVITES PARA CLIENTES</p><h2>Configure os destinos dos QR Codes</h2><p>Use o link direto de avaliação do Google e o perfil oficial do Instagram.</p></div></div>
       <div className="qr-fields">
-        <label className="field"><span>Link para avaliar no Google</span><input type="url" value={draft.google} onChange={event => setDraft({ ...draft, google: event.target.value })} placeholder="https://g.page/r/.../review" /><small>Copie em Perfil da Empresa → Ler avaliações → Receber mais avaliações.</small></label>
+        <label className="field"><span>Link para avaliar no Google</span><input type="url" value={draft.google} onChange={event => setDraft({ ...draft, google: event.target.value })} placeholder="https://g.page/r/.../review" /><small>O QR já usa a ficha da Casa Studart. Se a empresa alterar a ficha, copie o novo link em Perfil da Empresa → Ler avaliações → Receber mais avaliações.</small></label>
         <label className="field"><span>Instagram da empresa</span><input value={draft.instagram} onChange={event => setDraft({ ...draft, instagram: event.target.value })} placeholder="@perfil ou https://www.instagram.com/perfil/" /></label>
         <div className="qr-save-row"><button className="primary-button" onClick={save}>Salvar e gerar QR Codes</button>{message && <span role="status">{message}</span>}{error && <span role="alert" className="form-error">{error}</span>}</div>
       </div>

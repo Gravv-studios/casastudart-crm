@@ -21,7 +21,7 @@ O arquivo `vercel.json` configura a publicação da versão estática na Vercel 
 
 Na edição publicada, os dados ficam salvos no navegador de cada dispositivo. Use o backup em **Configurações e guia** para preservar os registros. Um banco compartilhado exige uma API/banco externo.
 
-Em **Avaliações e QR**, cadastre o link de avaliação obtido no Perfil da Empresa do Google (Ler avaliações → Receber mais avaliações) e o perfil oficial do Instagram. Os links e os QR Codes ficam salvos no navegador usado para configurá-los. Teste cada link antes de compartilhar a imagem com clientes.
+Em **Avaliações e QR**, os destinos oficiais da Casa Studart já vêm preenchidos: a ficha identificada no Google Maps e `@casastudart` no Instagram. Os QR Codes são gerados no navegador, sem serviço externo. Alterações manuais dos links ficam salvas somente no navegador usado para configurá-los. Teste cada link no celular antes de compartilhar a imagem com clientes.
 
 ## Desenvolvimento local
 
