@@ -2,9 +2,11 @@ export type Kind = 'contact' | 'ticket' | 'task' | 'note' | 'campaign' | 'site' 
 export type Entry = { id: string; kind: Kind; updatedAt: string; data: Record<string,string> };
 export type Activity = { id:string; entity_id:string; action:string; label:string; created_at:string };
 export const OWNERS = ['Hugo', 'Marcos', 'Atendimento'];
-export const SOURCES = ['Site', 'Indicação', 'Evento', 'Contato direto'];
+export const SOURCES = ['Site', 'Indicação', 'Evento', 'Contato direto', 'Loja online'];
+export const GENDERS = ['Não informado', 'Feminino', 'Masculino', 'Outro'];
+export const UFS = ['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO'];
 export const STATUSES = ['Novo', 'Em andamento', 'Aguardando', 'Resolvido'];
-export const TODAY = '2026-09-20';
+export const TODAY = (()=>{const d=new Date();return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10);})();
 export const CONTACT_TYPES = ['Cliente', 'Parceiro', 'Fornecedor', 'Contato'];
 const names = ['Ana Monteiro', 'Rafael Borges', 'Beatriz Lima', 'Felipe Cardoso', 'Marina Costa', 'Pedro Almeida', 'Juliana Ribeiro', 'Lucas Martins', 'Clara Nunes', 'Bruno Teixeira', 'Isabela Rocha', 'Gabriel Santos'];
 export const seedEntries: Entry[] = [
@@ -77,7 +79,7 @@ export function financialSummary(entries:Entry[],month='all',scope='Empresa') {
 }
 export function validateEntry(kind:unknown, data:unknown):Record<string,string> {
   if (!['contact','ticket','task','note','campaign','site','expense','income'].includes(String(kind)) || !data || typeof data!=='object' || Array.isArray(data)) throw new Error('Registro inválido.');
-  const allowed:Record<string,string[]>={contact:['name','email','phone','city','type','source','owner','status','company','notes','created'],ticket:['title','contactId','status','priority','owner','due','channel','description'],task:['title','due','time','owner','priority','status','category','description'],note:['contactId','text','author'],campaign:['title','audience','message','offer','status','scheduled'],site:['title','siteName','url','page','currentText','newText','status','priority','due','owner'],expense:['title','supplier','category','amount','due','recurrence','status','paymentMethod','scope','competence','paidDate','notes'],income:['title','client','category','amount','due','recurrence','status','paymentMethod','scope','competence','receivedDate','notes']};
+  const allowed:Record<string,string[]>={contact:['name','email','phone','city','type','source','owner','status','company','notes','created','state','gender','altEmails','altPhones','origin','consent','importRef'],ticket:['title','contactId','status','priority','owner','due','channel','description'],task:['title','due','time','owner','priority','status','category','description'],note:['contactId','text','author'],campaign:['title','audience','message','offer','status','scheduled'],site:['title','siteName','url','page','currentText','newText','status','priority','due','owner'],expense:['title','supplier','category','amount','due','recurrence','status','paymentMethod','scope','competence','paidDate','notes'],income:['title','client','category','amount','due','recurrence','status','paymentMethod','scope','competence','receivedDate','notes']};
   const d:Record<string,string>={};
   for(const [key,value] of Object.entries(data)) {if(!allowed[String(kind)].includes(key)||typeof value!=='string'||value.length>4000) throw new Error('Campo inválido.'); d[key]=value.trim();}
   const required = kind==='contact'?['name','email','type','owner','status','source']:kind==='note'?['contactId','text','author']:kind==='campaign'?['title','audience','message','status']:kind==='site'?['title','siteName','url','page','newText','status','priority','owner']:kind==='expense'?['title','supplier','category','amount','due','status','scope']:kind==='income'?['title','client','category','amount','due','status','scope']:['title','status','owner','priority'];
@@ -91,6 +93,8 @@ export function validateEntry(kind:unknown, data:unknown):Record<string,string> 
   if(states.length&&!states.includes(d.status))throw new Error('Situação inválida.');
   if(d.priority&&!['Baixa','Normal','Alta'].includes(d.priority))throw new Error('Prioridade inválida.');
   if(kind==='contact'&&(!CONTACT_TYPES.includes(d.type)||!SOURCES.includes(d.source)))throw new Error('Tipo ou origem inválidos.');
+  if(kind==='contact'&&d.state&&!UFS.includes(d.state))throw new Error('UF inválida.');
+  if(kind==='contact'&&d.gender&&!GENDERS.includes(d.gender))throw new Error('Gênero inválido.');
   if(kind==='campaign'&&!['Rascunho','Pronta','Concluída'].includes(d.status))throw new Error('Situação inválida.');
   if(kind==='site'&&!['Solicitado','Em edição','Aguardando aprovação','Publicado'].includes(d.status))throw new Error('Situação inválida.');
   if(kind==='expense'&&!['Pendente','Agendado','Pago'].includes(d.status))throw new Error('Situação inválida.');

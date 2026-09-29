@@ -19,7 +19,7 @@ O repositório oficial é `https://github.com/Gravv-studios/casastudart-crm`. El
 
 O arquivo `vercel.json` configura a publicação da versão estática na Vercel a partir desse repositório.
 
-Na edição publicada, os dados ficam salvos no navegador de cada dispositivo. Use o backup em **Configurações e guia** para preservar os registros. Um banco compartilhado exige uma API/banco externo.
+Com `VITE_SUPABASE_URL` e `VITE_SUPABASE_ANON_KEY` configuradas na Vercel, o CRM pede login e salva tudo no Supabase (mesmos dados em qualquer aparelho). Sem elas, roda em modo demonstração, com dados no navegador. Passo a passo em `COMO-PUBLICAR.md`; banco em `supabase/schema.sql`.
 
 Em **Avaliações e QR**, os destinos oficiais da Casa Studart já vêm preenchidos: a ficha identificada no Google Maps e `@casastudart` no Instagram. Os QR Codes são gerados no navegador, sem serviço externo. Alterações manuais dos links ficam salvas somente no navegador usado para configurá-los. Teste cada link no celular antes de compartilhar a imagem com clientes.
 
@@ -44,4 +44,4 @@ O banco local fica em `.wrangler/state` e é separado do armazenamento da ediç�
 
 ## Limites
 
-O CRM prepara mensagens e abre a conversa; não dispara WhatsApp automaticamente. Integrações bancárias, WordPress e banco compartilhado exigem credenciais e serviços externos. Os registros iniciais são exemplos e devem ser substituídos por dados reais autorizados antes do uso operacional.
+O CRM prepara mensagens e abre a conversa; não dispara WhatsApp automaticamente. Integrações bancárias, WordPress/WooCommerce e API oficial do WhatsApp exigem credenciais e serviços externos. No modo demonstração os registros iniciais são exemplos; no modo banco o CRM começa vazio e recebe a base pela importação.

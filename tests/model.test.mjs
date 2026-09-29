@@ -1,6 +1,13 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {summarize,ranking,validateEntry,makeCsv,seedEntries,ledger,periodLedger,financialSummary} from '../lib/model.ts';
+test('contact segmentation accepts known values and preserves missing demographics',()=>{
+ const base=seedEntries.find(e=>e.kind==='contact').data;
+ assert.equal(validateEntry('contact',{...base,state:'DF',gender:'Não informado',origin:'Wix + WooCommerce'}).state,'DF');
+ assert.doesNotThrow(()=>validateEntry('contact',{...base,state:'',gender:'Não informado'}));
+ assert.throws(()=>validateEntry('contact',{...base,state:'XX'}));
+ assert.throws(()=>validateEntry('contact',{...base,gender:'adivinhado'}));
+});
 test('historical totals exclude refunded records and units',()=>{
  const rows=[{gross:10000,refund:0,units:2,category:'Linha A'},{gross:20000,refund:20000,units:4,category:'Linha A'},{gross:30000,refund:0,units:3,category:'Linha B'}];
  assert.deepEqual(summarize(rows),{gross:60000,refunds:20000,net:40000,count:3,validCount:2,ticket:20000,units:5});
