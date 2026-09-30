@@ -1,5 +1,20 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import {segmentContacts,testPhone,testEmail,previewMessage} from '../lib/outreach.ts';
+test('message preview isolates DF and does not include archived or unknown contacts',()=>{
+ const rows=[['1','DF','Ativo'],['2','SP','Ativo'],['3','','Ativo'],['4','DF','Arquivado']].map(([id,state,status])=>({id,kind:'contact',data:{state,status}}));
+ assert.deepEqual(segmentContacts(rows,'DF').map(x=>x.id),['1']);
+ assert.deepEqual(segmentContacts(rows,'unknown').map(x=>x.id),['3']);
+ assert.equal(segmentContacts(rows,'all').length,3);
+});
+test('test destinations reject multiple recipients and normalize Brazilian phones',()=>{
+ assert.equal(testPhone('(61) 99999-1234'),'5561999991234');
+ assert.equal(testPhone('+1 202 555 0123'),'12025550123');
+ assert.equal(testPhone('123'),'');assert.equal(testPhone('phone61999991234'),'');
+ assert.equal(testEmail('teste@example.com'),'teste@example.com');
+ assert.equal(testEmail('a@b.com,b@c.com'),'');assert.equal(testEmail('a@b.com?bcc=c@d.com'),'');
+ assert.equal(previewMessage('Olá, {nome}!','Maria Silva'),'Olá, Maria!');
+});
 import {summarize,ranking,validateEntry,makeCsv,seedEntries,ledger,periodLedger,financialSummary} from '../lib/model.ts';
 test('contact segmentation accepts known values and preserves missing demographics',()=>{
  const base=seedEntries.find(e=>e.kind==='contact').data;

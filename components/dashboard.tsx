@@ -5,8 +5,8 @@ import { Entry, money, expenseCents, financialSummary, prettyDate, TODAY } from 
 import { Badge, Blank } from './shared';
 
 export function Metrics({entries}:{entries:Entry[]}){
- const s=financialSummary(entries,'2026-09','Empresa');
- const cards=[['A receber',money(s.receivable),`${s.incomes.filter(x=>x.data.status!=='Recebido').length} recebimentos em aberto`,ArrowDownLeft],['A pagar',money(s.payable),`${s.expenses.filter(x=>x.data.status!=='Pago').length} contas em aberto`,WalletCards],['Saldo previsto',money(s.projected),'Entradas menos saídas de setembro',TrendingUp],['Valores atrasados',money(s.overduePayable+s.overdueReceivable),'Contas e cobranças vencidas',AlertTriangle]] as const;
+ const s=financialSummary(entries,TODAY.slice(0,7),'Empresa');
+ const cards=[['A receber',money(s.receivable),`${s.incomes.filter(x=>x.data.status!=='Recebido').length} recebimentos em aberto`,ArrowDownLeft],['A pagar',money(s.payable),`${s.expenses.filter(x=>x.data.status!=='Pago').length} contas em aberto`,WalletCards],['Saldo previsto',money(s.projected),'Entradas menos saídas do mês atual',TrendingUp],['Valores atrasados',money(s.overduePayable+s.overdueReceivable),'Contas e cobranças vencidas',AlertTriangle]] as const;
  return <div className="metric-grid">{cards.map(([label,value,sub,Icon])=><section className="metric" key={label}><div><p>{label}</p><Icon/></div><strong>{value}</strong><small>{sub}</small></section>)}</div>;
 }
 

@@ -16,6 +16,7 @@ import { Editor, ContactDetail, Draft } from './editor';
 import { Campaigns, Sites } from './business';
 import Finance from './finance';
 import ReviewQr from './review-qr';
+import OutreachDemo, { MeetingGuide } from './outreach-demo';
 import { loadLocalCrm, mutateLocalCrm, importLocalContacts } from '@/lib/client-store';
 import { remoteEnabled, loadRemoteCrm, mutateRemoteCrm, importRemoteContacts, supabase } from '@/lib/remote-store';
 import { AuthGate, signOut } from './auth';
@@ -43,7 +44,7 @@ function Workspace(){
  const staticMode=!remote&&typeof window!=='undefined'&&Boolean((globalThis as typeof globalThis&{__CRM_STATIC__?:boolean}).__CRM_STATIC__);
  const [userEmail,setUserEmail]=useState('');
  useEffect(()=>{if(remote)void supabase().auth.getUser().then(({data})=>setUserEmail(data.user?.email||''));},[remote]);
- const [view,setView]=useState('overview'),[period,setPeriod]=useState('2026-09');
+ const [view,setView]=useState('overview'),[period,setPeriod]=useState(new Date().toLocaleDateString('sv-SE').slice(0,7));
  const [entries,setEntries]=useState<Entry[]>([]),[activity,setActivity]=useState<Activity[]>([]);
  const [loading,setLoading]=useState(true),[error,setError]=useState(''),[busy,setBusy]=useState(false);
  const [feedback,setFeedback]=useState<Feedback|null>(null),[draft,setDraft]=useState<Draft|null>(null),[detailId,setDetailId]=useState<string|null>(null),[deleting,setDeleting]=useState<Entry|null>(null),[tour,setTour]=useState<number|null>(null);
@@ -63,7 +64,7 @@ function Workspace(){
  const steps=[['overview','Comece pelo que pede atenção','Veja caixa, campanhas, sites e tarefas no mesmo painel.'],['campaigns','Prepare uma oferta','Crie a mensagem, confira a personalização e abra a conversa no WhatsApp.'],['sites','Controle as alterações','Guarde o texto atual, o novo texto, o prazo e a aprovação de cada site.'],['finance','Controle o dinheiro','Acompanhe contas a pagar e receber, atrasos, resultado e fluxo de caixa.'],['contacts','Mantenha os contatos completos','Cadastre o WhatsApp e o contexto de cada pessoa para usar nas campanhas.']];
  return <><a className="skip-link" href="#main-content">Pular para o conteúdo</a><Sidebar className="brand-sidebar"><SidebarHeader><button className="brand-lockup" onClick={()=>navigate('overview')} aria-label="CRM do Hugo — visão geral"><span className="brand-mark">HU</span><span>CRM DO HUGO<small>NEGÓCIOS & CONTROLE</small></span></button></SidebarHeader><SidebarContent><p className="nav-label">ESPAÇO DE TRABALHO</p><SidebarMenu>{nav.map(([id,label,Icon])=><SidebarMenuItem key={id}><SidebarMenuButton className="nav-item" isActive={view===id} onClick={()=>navigate(id)}><Icon/><span>{label}</span>{id==='support'&&openTickets>0&&<b>{openTickets}</b>}</SidebarMenuButton></SidebarMenuItem>)}</SidebarMenu></SidebarContent><SidebarFooter><button className="demo-card" onClick={()=>setTour(0)}><Sparkles/><strong>Conheça o seu CRM</strong><p>Um passeio de 5 passos <ArrowRight/></p></button><div className="profile"><span className="avatar">{remote&&userEmail?userEmail.slice(0,2).toUpperCase():'HU'}</span><div style={{minWidth:0}}><strong>{remote?(userEmail.split('@')[0]||'Usuário'):'Hugo'}</strong><small>{remote?'Conectado':'Administrador'}</small></div>{remote&&<button className="profile-logout" aria-label="Sair" title="Sair" onClick={signOut}><LogOut/></button>}</div></SidebarFooter></Sidebar><main className="workspace" id="main-content"><header className="topbar"><div className="breadcrumbs"><SidebarTrigger/><span>CRM do Hugo</span><ChevronRight/><strong>{nav.find(x=>x[0]===view)?.[1]}</strong></div><div className="top-actions"><span className="live-dot"/><span>Dados salvos</span><button className="icon-button" aria-label="Atualizar registros" disabled={busy||loading} onClick={()=>void reload()}><RefreshCw/></button><button className="icon-button" aria-label="Guia do CRM" onClick={()=>setTour(0)}><CircleHelp/></button></div></header><div className="page"><div className="page-heading"><div><p className="eyebrow">CRM DO HUGO · PAINEL DE GESTÃO</p><h1>{headings[view][0]}</h1><p>{headings[view][1]}</p></div></div>{loading?<div className="metric-grid" aria-label="Carregando registros" aria-busy="true">{[1,2,3,4].map(i=><section key={i} className="metric"><Skeleton className="h-5 w-3/4"/><Skeleton className="h-10 w-1/2 my-4"/><Skeleton className="h-4 w-full"/></section>)}</div>:error?<div className="error-box" role="alert"><Info style={{margin:'auto'}}/><h2>Não foi possível atualizar o painel.</h2><p>{error}</p><button className="primary-button" onClick={()=>void reload()}>Tentar novamente</button></div>:<>{view==='overview'&&<Dashboard entries={entries} period={period} setPeriod={setPeriod} navigate={navigate} edit={edit}/>}
  {view==='contacts'&&<Contacts entries={entries} create={()=>create('contact')} edit={edit} remove={setDeleting} detail={e=>setDetailId(e.id)}/>}
- {view==='campaigns'&&<Campaigns {...workProps}/>}
+ {view==='campaigns'&&<><OutreachDemo entries={entries}/><Campaigns {...workProps}/></>}
  {view==='reviews'&&<ReviewQr/>}
  {view==='sites'&&<Sites {...workProps}/>}
  {view==='finance'&&<Finance {...workProps}/>}
@@ -72,7 +73,7 @@ function Workspace(){
  {view==='calendar'&&<Calendar {...workProps}/>}
  {view==='reports'&&<Reports period={period} setPeriod={setPeriod} entries={entries}/>}
  {view==='activity'&&<ActivityLog activity={activity}/>}
- {view==='settings'&&<Help entries={entries} activity={activity} refresh={()=>void reload()} busy={busy} remote={remote} onImport={remote?(p)=>importRemoteContacts(p):staticMode?async(p,removeDemo)=>importLocalContacts(p,removeDemo):undefined}/>}
+ {view==='settings'&&<><MeetingGuide entries={entries}/><Help entries={entries} activity={activity} refresh={()=>void reload()} busy={busy} remote={remote} onImport={remote?(p)=>importRemoteContacts(p):staticMode?async(p,removeDemo)=>importLocalContacts(p,removeDemo):undefined}/></>}
  </>}<footer className="page-footer"><span>CRM DO HUGO <b>·</b> GESTÃO</span><span>Contatos, operação e financeiro no mesmo lugar</span><button onClick={()=>navigate('settings')}>Como usar</button></footer></div></main>
  {draft&&<Editor key={draft.entry?.id||draft.kind+(draft.date||'')} draft={draft} entries={entries} busy={busy} onClose={()=>setDraft(null)} onSave={(kind,data,entry)=>send(entry?'PUT':'POST',entry?{id:entry.id,updatedAt:entry.updatedAt,data}:{kind,data},'Registro salvo.')}/>}
  {detail&&<ContactDetail entry={detail} entries={entries} onClose={()=>setDetailId(null)} onEdit={edit} busy={busy} onNote={(contactId,text)=>send('POST',{kind:'note',data:{contactId,text,author:'Hugo'}},'Anotação adicionada.')}/>}
