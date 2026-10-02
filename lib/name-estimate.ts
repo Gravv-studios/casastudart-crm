@@ -1,4 +1,10 @@
 // Heurística local e conservadora. Não representa gênero declarado pela pessoa.
+export function contactGender(data:Record<string,string>) {
+ const saved=data.gender;
+ if(saved&&saved!=='Não informado')return {label:saved==='Masculino'?'Homem':saved==='Feminino'?'Mulher':saved,estimated:false};
+ const estimate=estimateName(data.name||'');
+ return {label:estimate.startsWith('Masculino')?'Homem':estimate.startsWith('Feminino')?'Mulher':'Não informado',estimated:estimate!=='Não informado'};
+}
 const feminine = new Set('maria ana adriana alessandra aline amanda amelia andreia andrea angela antonia beatriz bruna camila carla carolina cecilia claudia cristiane daniela debora denise eliane elisabete elisabeth elizabete elizabeth erica fabiana fernanda flavia francisca gabriela helena isabela isabel janaina joana juliana julia karina larissa laura leticia lidia lilian lucia luciana luiza marcia mariana marlene marta monica natalia patricia paula priscila raquel regina renata rita roberta rosa rosana sandra silvia simone sonia sueli tatiana teresa valeria vanessa vera vitoria'.split(' '));
 const masculine = new Set('joao jose antonio abnor adalberto ademir adenauer aderildo adriano afonso agenor ailton airton alair alberto alcedir alcindo alexandre alfredo alvaro andre antonio arnaldo arthur augusto benedito bernardo bruno caio carlos cesar claudio daniel danilo davi david diego diogo domingos douglas eduardo edson elias emerson eraldo ernesto fabio felipe fernando flavio francisco frederico gabriel geraldo gilberto gilmar gustavo helio henrique hugo igor isaac ivan jaime jairo jeferson jefferson jorge julio junior kleber leandro leonardo lucas luciano luis luiz manoel manuel marcelo marcio marcos mario mateus matheus mauricio miguel milton nelson nilton oscar otavio paulo pedro rafael raimundo ramon renato ricardo roberto rodrigo rogerio romulo ronaldo rubens samuel sergio silvio thiago tiago valdir victor vitor vinicius walter washington wellington wilson'.split(' '));
 export function estimateName(name:string):string {

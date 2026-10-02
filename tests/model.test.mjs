@@ -1,5 +1,13 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import {contactGender} from '../lib/name-estimate.ts';
+test('contact gender labels distinguish estimates and preserve saved values',()=>{
+ assert.deepEqual(contactGender({name:'João'}),{label:'Homem',estimated:true});
+ assert.deepEqual(contactGender({name:'Maria',gender:'Não informado'}),{label:'Mulher',estimated:true});
+ assert.deepEqual(contactGender({name:'Maria',gender:'Masculino'}),{label:'Homem',estimated:false});
+ assert.deepEqual(contactGender({name:'Maria',gender:'Outro'}),{label:'Outro',estimated:false});
+ for(const name of ['Alex','A','Maria Comércio','loja@exemplo.com',''])assert.deepEqual(contactGender({name}),{label:'Não informado',estimated:false});
+});
 import {segmentContacts,testPhone,testEmail,previewMessage} from '../lib/outreach.ts';
 test('message preview isolates DF and does not include archived or unknown contacts',()=>{
  const rows=[['1','DF','Ativo'],['2','SP','Ativo'],['3','','Ativo'],['4','DF','Arquivado']].map(([id,state,status])=>({id,kind:'contact',data:{state,status}}));
