@@ -6,7 +6,8 @@ CRM comercial, operacional e financeiro com contatos, campanhas de WhatsApp, alt
 
 - Visão geral das prioridades e do caixa.
 - Contatos e histórico de atendimento.
-- Mensagens de ofertas para abertura assistida no WhatsApp.
+- **Disparos WhatsApp** pela API oficial da Meta: escolha de vários estados, gênero, só autorizados, sem repetir quem recebeu há pouco, teste, envio em lotes com pausa, relatório, respostas e descadastro automático (SAIR). Guia: `WHATSAPP-DISPAROS.md`.
+- Mensagens prontas para abertura assistida no WhatsApp.
 - QR Codes para avaliação direta no Google e acesso ao perfil do Instagram, com download em PNG.
 - Pedidos e versões de textos dos sites.
 - Contas a pagar e receber, atrasos, recorrências e separação entre empresa e pessoal.
@@ -38,10 +39,11 @@ O banco local fica em `.wrangler/state` e é separado do armazenamento da ediç�
 - `npm run check`: validação de tipos.
 - `npm test`: regras, cálculos e reconciliação financeira.
 - `npm run test:api`: persistência e mutações da API local.
+- `npm run test:whatsapp`: funções de disparo com Meta e Supabase simulados.
 - `npm run build`: aplicação completa com servidor.
 - `npm run build:pages`: edição estática preparada para GitHub Pages.
 - `npm run build:vercel`: edição estática preparada para Vercel.
 
 ## Limites
 
-O CRM prepara mensagens e abre a conversa; não dispara WhatsApp automaticamente. Integrações bancárias, WordPress/WooCommerce e API oficial do WhatsApp exigem credenciais e serviços externos. No modo demonstração os registros iniciais são exemplos; no modo banco o CRM começa vazio e recebe a base pela importação.
+Os disparos usam a API oficial do WhatsApp e só funcionam depois de configurar chip, Meta, Supabase e Vercel (`WHATSAPP-DISPAROS.md`). Sem isso, a tela de disparos monta o público e a prévia, mas não envia. Integrações bancárias, WordPress/WooCommerce e API oficial do WhatsApp exigem credenciais e serviços externos. No modo demonstração os registros iniciais são exemplos; no modo banco o CRM começa vazio e recebe a base pela importação.
