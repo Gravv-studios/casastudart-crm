@@ -14,7 +14,7 @@ import { Choice, exportCsv } from './shared';
 type Props = { entries: Entry[]; create: (kind: Kind, date?: string) => void; edit: (entry: Entry) => void; remove: (entry: Entry) => void; save: (entry: Entry) => Promise<boolean>; busy: boolean };
 type Change = { log: Track; image?: string };
 type Store = { campaigns: Entry[]; track: (c?: Entry) => Track; image: (c?: Entry) => string; mark: (id: string, phone: string, status: string) => void; setImage: (id: string, dataUrl: string) => void; optOut: (contact: Entry) => Promise<boolean> };
-const tabs = [['enviar', 'Disparar', Send], ['resumo', 'Visão geral', BarChart3], ['mensagens', 'Mensagens', MessageCircle], ['automatico', 'Automático', PlugZap]] as const;
+const tabs = [['enviar', 'Enviar um por um', Send], ['resumo', 'Visão geral', BarChart3], ['mensagens', 'Mensagens', MessageCircle]] as const;
 const GENDERS: string[][] = [['all', 'Homens e mulheres'], ['Mulher', 'Só mulheres'], ['Homem', 'Só homens']];
 const ROW_OPTIONS: string[][] = [...STATUS, ['x', 'Desmarcar envio'], ['out', 'Não quer mais receber']];
 const OLD_SENT_KEY = 'crm-zap-enviados-v1';
@@ -24,9 +24,15 @@ const fill = (c: Entry | undefined, name: string) => c ? (c.data.message || '').
 const openChat = (phone: string, text?: string) => window.open(`https://wa.me/${phone}${text ? '?text=' + encodeURIComponent(text) : ''}`, '_blank', 'noopener,noreferrer');
 
 export default function WhatsApp(props: Props) {
-  const [tab, setTab] = useState<string>('enviar');
+  const [tab, setTab] = useState<string>('enviar'), [manual, setManual] = useState(false);
   const { store, sync, syncError, retry } = useStore(props);
+  // O disparo oficial pela Meta é a tela principal. O envio manual, um por um, fica como alternativa.
+  if (!manual) return <>
+    <Dispatch entries={props.entries} />
+    <p className="wa-switch"><button className="text-button" onClick={() => setManual(true)}><MessageCircle />Enviar manualmente, um por um, pelo meu WhatsApp</button></p>
+  </>;
   return <>
+    <p className="wa-switch top"><button className="text-button" onClick={() => setManual(false)}><PlugZap />Voltar para os disparos pela Meta</button></p>
     <div className="wa-tabs" role="tablist">{tabs.map(([id, label, Icon]) => <button key={id} role="tab" aria-selected={tab === id} className={tab === id ? 'active' : ''} onClick={() => setTab(id)}><Icon />{label}</button>)}
       <span className="wa-sync" role="status">{sync === 'saving' ? <><RefreshCw className="spin" />Salvando…</> : sync === 'saved' ? <><CheckCircle2 />Salvo</> : sync === 'error' ? <button className="text-button" onClick={retry}><AlertTriangle />Não salvou. Tentar de novo</button> : null}</span>
     </div>
@@ -34,7 +40,6 @@ export default function WhatsApp(props: Props) {
     {tab === 'enviar' && <SendByState {...props} store={store} openMessages={() => setTab('mensagens')} />}
     {tab === 'resumo' && <Overview entries={props.entries} store={store} />}
     {tab === 'mensagens' && <><Campaigns {...props} /><details className="panel" style={{ marginTop: 24, padding: 20 }}><summary style={{ cursor: 'pointer', fontWeight: 600 }}>Teste individual de WhatsApp e e-mail</summary><div style={{ marginTop: 20 }}><OutreachDemo entries={props.entries} /></div></details></>}
-    {tab === 'automatico' && <Dispatch entries={props.entries} />}
   </>;
 }
 

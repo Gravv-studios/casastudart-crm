@@ -27,7 +27,7 @@ const mainViews=new Set(['campaigns','contacts']);
 const headings:Record<string,[string,string]>={
  overview:['Tudo começa com uma boa visão.','Acompanhe a rotina, os relacionamentos e os números da Casa.'],
  contacts:['Cada relacionamento, em um só lugar.','Cadastros, contexto e histórico de atendimento.'],
- campaigns:['Disparos de WhatsApp.','Escolha os estados, escolha a mensagem e envie.'],
+ campaigns:['Disparos de WhatsApp.','Escolha os estados, o modelo aprovado e dispare pelo WhatsApp oficial da Casa.'],
  reviews:['Facilite o próximo passo do cliente.','QR Codes para avaliação no Google e acesso ao Instagram.'],
  sites:['Os textos dos sites, sob controle.','Organize pedidos, versões, responsáveis, prazos e aprovações.'],
  finance:['O dinheiro da empresa, finalmente organizado.','Acompanhe o que entra, o que sai, os atrasos e o saldo do caixa.'],
